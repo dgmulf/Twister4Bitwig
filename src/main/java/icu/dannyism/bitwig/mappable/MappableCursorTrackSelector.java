@@ -11,18 +11,25 @@ public class MappableCursorTrackSelector extends AbstractDiscreteMappableParamet
     private boolean autoScroll = true;
     private final CursorTrack cursorTrack;
     private final TrackBank siblingsBank;
-    private int cursorIndex = -1;
+    private int cursorPosition = -1;
     private int trackCount = 0;
+    private int relativeCursorIndex;
+    private final boolean[] siblingIsActive = new boolean[SIBLINGS_BANK_CAPACITY];
 
     public MappableCursorTrackSelector(CursorTrack cursorTrack) {
         this.cursorTrack = cursorTrack;
         siblingsBank = cursorTrack.createSiblingsTrackBank(SIBLINGS_BANK_CAPACITY, 0, 0, true, true);
-        siblingsBank.cursorIndex().markInterested();
-        for (int i = 0; i < SIBLINGS_BANK_CAPACITY; i++)
-            siblingsBank.getItemAt(i).isActivated().markInterested();
+
+        siblingsBank.cursorIndex().addValueObserver((int index) -> relativeCursorIndex = index);
+        for (int i = 0; i < SIBLINGS_BANK_CAPACITY; i++) {
+            final int index = i;
+            siblingsBank.getItemAt(i).isActivated().addValueObserver((boolean active) -> {
+                siblingIsActive[index] = active;
+            });
+        }
 
         cursorTrack.position().addValueObserver((int position) -> {
-            cursorIndex = position;
+            cursorPosition = position;
             flushValue();
         });
         siblingsBank.channelCount().addValueObserver((int count) -> {
@@ -33,7 +40,7 @@ public class MappableCursorTrackSelector extends AbstractDiscreteMappableParamet
 
     @Override
     public void increment(int delta) {
-        int newIndex = siblingsBank.cursorIndex().get();
+        int newIndex = relativeCursorIndex;
         if (delta > 0) {
             for (int i = 0; i < delta; i++)
                 newIndex = nextActiveTrackIndex(newIndex);
@@ -54,7 +61,7 @@ public class MappableCursorTrackSelector extends AbstractDiscreteMappableParamet
 
     @Override
     protected void flushValue() {
-        value = (trackCount > 1) ? (double) cursorIndex / (double) (trackCount - 1) : 0.5;
+        value = (trackCount > 1) ? (double) cursorPosition / (double) (trackCount - 1) : 0.5;
         super.flushValue();
     }
 
@@ -64,7 +71,7 @@ public class MappableCursorTrackSelector extends AbstractDiscreteMappableParamet
             index++;
             if (index >= SIBLINGS_BANK_CAPACITY)
                 return -1;
-        } while (!siblingsBank.getItemAt(index).isActivated().get());
+        } while (!siblingIsActive[index]);
         return index;
     }
 
@@ -74,7 +81,7 @@ public class MappableCursorTrackSelector extends AbstractDiscreteMappableParamet
             index--;
             if (index < 0)
                 return -1;
-        } while (!siblingsBank.getItemAt(index).isActivated().get());
+        } while (!siblingIsActive[index]);
         return index;
     }
 }
