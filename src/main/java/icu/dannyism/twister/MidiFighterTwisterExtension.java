@@ -72,6 +72,7 @@ public class MidiFighterTwisterExtension extends ControllerExtension {
 
         final MidiFighterTwister.Knob enableDeviceKnob              = twister.getKnob(DEVICE_BANK, 6);
         enableDeviceKnob.getButton().onDown(cursorDevice.isEnabled()::toggle);
+        enableDeviceKnob.getButton().onLongPress(cursorDevice.isEnabled()::toggle);
 
         final MidiFighterTwister.Knob browserKnob                   = twister.getKnob(DEVICE_BANK, 7);
         new BrowserKnobMapping(
