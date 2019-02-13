@@ -1,10 +1,11 @@
 package icu.dannyism.twister;
-import java.util.UUID;
 
 import com.bitwig.extension.api.PlatformType;
 import com.bitwig.extension.controller.AutoDetectionMidiPortNamesList;
 import com.bitwig.extension.controller.ControllerExtensionDefinition;
 import com.bitwig.extension.controller.api.ControllerHost;
+
+import java.util.UUID;
 
 public class MidiFighterTwisterExtensionDefinition extends ControllerExtensionDefinition
 {
@@ -29,7 +30,7 @@ public class MidiFighterTwisterExtensionDefinition extends ControllerExtensionDe
     @Override
     public String getVersion()
     {
-        return "1.0";
+        return "1.0.1";
     }
 
     @Override

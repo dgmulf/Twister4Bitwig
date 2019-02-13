@@ -6,7 +6,7 @@
 	<artifactId>Twister4Bitwig</artifactId>
 	<packaging>jar</packaging>
 	<name>Twister4Bitwig</name>
-	<version>1.0</version>
+	<version>1.0.1</version>
 	
 	<repositories>
        <repository>
